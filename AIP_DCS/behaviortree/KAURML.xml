@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<root BTCPP_format="4">
+    <BehaviorTree ID="F16_BFM_Tree">
+        <!-- 메인 시퀀스 -->
+        <Sequence name="Main_Sequence">
+            
+            <!-- 상황 업데이트 -->
+            <Sequence name="Update_Sequence">
+                <DirectionVectorUpdate BB="{BB}" />
+                <DistanceUpdate BB="{BB}" />
+                <CheckSight BB="{BB}" />
+                <AngleOffUpdate BB="{BB}" />
+                <AspectAngleUpdate BB="{BB}" />
+                <BFM_ModeDetermination BB="{BB}" />
+            </Sequence>
+            
+            <!-- BFM 모드별 행동 선택 -->
+            <Fallback name="BFM_Mode_Selection">
+                
+                <!-- 탐지 모드 -->
+                <Sequence name="Detecting_Mode">
+                    <DECO_BFMCheck BB="{BB}" CheckBFM="DETECTING" />
+                    <Task_Detecting BB="{BB}" />
+                </Sequence>
+                
+                <!-- 공격 BFM -->
+                <Sequence name="Offensive_BFM">
+                    <DECO_BFMCheck BB="{BB}" CheckBFM="OBFM" />
+                    <Fallback name="Offensive_Actions">
+                        <!-- 무기 사용 가능 범위에서 교전 -->
+                        <Sequence name="Weapon_Engagement">
+							<DECO_DistanceCheck BB="{BB}" UpDown="Less" Distance="2500" />
+                            <Task_WeaponEngagement BB="{BB}" />
+                        </Sequence>
+                        <!-- 일반 공격 BFM -->
+                        <Task_OffensiveBFM BB="{BB}" />
+                    </Fallback>
+                </Sequence>
+                
+                <!-- 방어 BFM -->
+                <Sequence name="Defensive_BFM">
+                    <DECO_BFMCheck BB="{BB}" CheckBFM="DBFM" />
+                    <Task_DefensiveBFM BB="{BB}" />
+                </Sequence>
+                
+                <!-- 정면 BFM -->
+                <Sequence name="HeadOn_BFM">
+                    <DECO_BFMCheck BB="{BB}" CheckBFM="HABFM" />
+                    <Task_HeadOnBFM BB="{BB}" />
+                </Sequence>
+                
+                <!-- 시저스 상황 -->
+                <Sequence name="Scissors_Mode">
+                    <DECO_BFMCheck BB="{BB}" CheckBFM="SCISSORS" />
+                    <Fallback name="Scissors_Actions">
+                        <!-- 가까운 거리에서는 기총 교전 -->
+                        <Sequence name="Close_Scissors">
+                            <DECO_DistanceCheck BB="{BB}" UpDown="Less" Distance="1000" />
+                            <Task_WeaponEngagement BB="{BB}" />
+                        </Sequence>
+                        <!-- 일반 시저스 - 방어적 기동 -->
+                        <Task_DefensiveBFM BB="{BB}" />
+                    </Fallback>
+                </Sequence>
+                
+                <!-- 기본 행동 (아무것도 해당되지 않을 때) -->
+                <Task_Pure BB="{BB}" />
+                
+            </Fallback>
+            
+        </Sequence>
+    </BehaviorTree>
+</root>
