@@ -32,15 +32,12 @@ if __name__ == "__main__":
         'target': [6000.0, 0.0, -7000.0, 0.0, 0.0, 180.0, 300.0],
     }
     
-    # AIP_ownship = CppBT.AIPilot("AIP_DCS_ownship.dll")
-    # AIP_target = CppBT.AIPilot("AIP_DCS_target.dll")
     AIP_ownship = CppBT.AIPilot("AIP_DCS.dll")
     AIP_target = CppBT.AIPilot("AIP_DCS.dll")
     command_evt = threading.Event()
     init_evt = threading.Event()
     state_q = queue.Queue(maxsize=10)
     engageEnv = DogFightWrapper(env_config, AIP_ownship, AIP_target)
-    # commBattleViewer = CommUDP('192.168.10.114', 9999, command_evt, init_evt, state_q)
     commBattleViewer = CommUDP('127.0.0.1', 9999, command_evt, init_evt, state_q)
     commBattleViewer.start()
     init_state = []

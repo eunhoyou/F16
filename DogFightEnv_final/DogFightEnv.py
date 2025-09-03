@@ -202,7 +202,7 @@ class DogFight_BaseEnv(gym.Env):
             self.info["end_condition"] = 'max time out'            
             done = True
 
-        elif self._ownship_state[45] <= 0 :
+        elif self._ownship_state[45] <= 0:
             self.info["end_condition"] = 'sim health = {} target health = {}'.format(
                 self._ownship_state[45], self._target_state[45])
             done = True
