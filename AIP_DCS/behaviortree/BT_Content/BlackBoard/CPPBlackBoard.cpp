@@ -26,7 +26,6 @@ CPPBlackBoard::CPPBlackBoard()
 	Distance = 0;
 	Throttle = 0;
 
-
 	Los_Degree = 0;
 	Los_Degree_Target = 0;
 
@@ -37,9 +36,6 @@ CPPBlackBoard::CPPBlackBoard()
 	ACM = EF;
 	
 	Team = UNKNOWN;
-
-
-	
 }
 
 CPPBlackBoard::~CPPBlackBoard()

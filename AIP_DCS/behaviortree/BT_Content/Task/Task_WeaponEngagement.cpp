@@ -14,22 +14,18 @@ namespace Action
         Optional<CPPBlackBoard*> BB = getInput<CPPBlackBoard*>("BB");
 
         float distance = (*BB)->Distance;
-        float aspectAngle = (*BB)->MyAspectAngle_Degree;
+        float los = (*BB)->Los_Degree;
 
-        // 무기 사용 우선순위: 미사일 -> 기총
-        if (IsInMissileRange(BB.value()))
+        // WEZ 조건 확인
+        if (IsInWEZ(BB.value()))
         {
-            (*BB)->VP_Cartesian = CalculateMissileEngagement(BB.value());
-        }
-        else if (IsInGunRange(BB.value()) && HasValidGunSolution(BB.value()))
-        {
-            (*BB)->VP_Cartesian = CalculateGunEngagement(BB.value());
+            // WEZ 내에서 무기 교전 - 정밀 조준점 계산
+            (*BB)->VP_Cartesian = CalculateWeaponAimPoint(BB.value());
         }
         else
         {
-            // 무기 사용 불가 - 위치 개선
-            Vector3 targetLocation = (*BB)->TargetLocaion_Cartesian;
-            (*BB)->VP_Cartesian = targetLocation;
+            // WEZ 밖에서는 WEZ 진입을 위한 위치 이동
+            (*BB)->VP_Cartesian = CalculateWEZEntryPoint(BB.value());
         }
 
         // 교전 시 최대 스로틀
@@ -38,97 +34,113 @@ namespace Action
         return NodeStatus::SUCCESS;
     }
 
-    Vector3 Task_WeaponEngagement::CalculateMissileEngagement(CPPBlackBoard* BB)
+    Vector3 Task_WeaponEngagement::CalculateWeaponAimPoint(CPPBlackBoard* BB)
     {
-        // 미사일 사격을 위한 위치 계산
-        Vector3 targetLocation = BB->TargetLocaion_Cartesian;
-        Vector3 targetForward = BB->TargetForwardVector;
-        float targetSpeed = BB->TargetSpeed_MS;
-        float distance = BB->Distance;
-
-        // Pure Pursuit for missile engagement
-        // 미사일 비행 시간 예측
-        float missileSpeed = 800.0f; // 대략적인 미사일 속도 m/s
-        float missileFlightTime = distance / missileSpeed;
-
-        // 표적의 예상 위치
-        Vector3 leadPoint = targetLocation + targetForward * targetSpeed * missileFlightTime;
-
-        return leadPoint;
-    }
-
-    Vector3 Task_WeaponEngagement::CalculateGunEngagement(CPPBlackBoard* BB)
-    {
-        // 기총 사격을 위한 Lead Pursuit 계산
+        // WEZ 내에서 무기 사격을 위한 정밀 조준점 계산
         Vector3 targetLocation = BB->TargetLocaion_Cartesian;
         Vector3 targetForward = BB->TargetForwardVector;
         Vector3 targetRight = BB->TargetRightVector;
         float targetSpeed = BB->TargetSpeed_MS;
         float distance = BB->Distance;
 
-        // 기총 탄환 속도 (대략 1000 m/s)
-        float bulletSpeed = 1000.0f;
-        float timeOfFlight = distance / bulletSpeed;
+        // 시뮬레이터 무기 시스템의 탄환/미사일 속도 (예상값)
+        float projectileSpeed = 900.0f; // m/s (시뮬레이터 설정에 따라 조정 가능)
 
-        // Lead 계산
+        // 비행 시간 계산
+        float timeOfFlight = distance / projectileSpeed;
+
+        // Lead 계산 - 적기의 예상 위치
         Vector3 leadVector = targetForward * targetSpeed * timeOfFlight;
 
-        // 적기가 선회 중이라면 추가 lead 필요
-        Vector3 turnLead = targetRight * targetSpeed * 0.1f; // 간단한 선회 보정
+        // 적기가 선회 중인 경우를 위한 추가 lead (간단한 예측)
+        Vector3 turnLead = targetRight * targetSpeed * 0.05f; // 5% 선회 보정
 
-        Vector3 gunAimPoint = targetLocation + leadVector + turnLead;
+        // 최종 조준점
+        Vector3 aimPoint = targetLocation + leadVector + turnLead;
 
-        return gunAimPoint;
+        return aimPoint;
     }
 
-    bool Task_WeaponEngagement::IsInMissileRange(CPPBlackBoard* BB)
+    Vector3 Task_WeaponEngagement::CalculateWEZEntryPoint(CPPBlackBoard* BB)
+    {
+        // WEZ 진입을 위한 위치 계산
+        Vector3 myLocation = BB->MyLocation_Cartesian;
+        Vector3 targetLocation = BB->TargetLocaion_Cartesian;
+        Vector3 targetForward = BB->TargetForwardVector;
+        float distance = BB->Distance;
+
+        // WEZ 진입을 위한 최적 거리 (WEZ 중간 지점)
+        float optimalRange = (WEZ_MIN_RANGE + WEZ_MAX_RANGE) * 0.5f; // 약 533m
+
+        // 적기를 향한 방향 벡터
+        Vector3 toTarget = targetLocation - myLocation;
+        toTarget = toTarget / distance; // 정규화
+
+        Vector3 entryPoint;
+
+        if (distance > WEZ_MAX_RANGE)
+        {
+            // 너무 멀리 있을 때 - 적기 쪽으로 접근
+            entryPoint = targetLocation - toTarget * optimalRange;
+        }
+        else if (distance < WEZ_MIN_RANGE)
+        {
+            // 너무 가까이 있을 때 - 적기에서 멀어지면서 WEZ 각도 확보
+            entryPoint = myLocation - toTarget * (WEZ_MIN_RANGE - distance + 100.0f);
+        }
+        else
+        {
+            // 거리는 적절하지만 각도가 맞지 않을 때 - 각도 조정을 위한 기동
+            Vector3 myForward = BB->MyForwardVector;
+            Vector3 myRight = BB->MyRightVector;
+
+            // LOS가 2도 이내로 들어오도록 조정
+            float adjustmentDistance = 200.0f;
+
+            if (BB->Los_Degree > 2.0f)
+            {
+                // LOS 각도가 2도를 초과할 때 각도 조정 기동
+                Vector3 adjustDirection = myRight;
+
+                // LOS 각도에 따라 조정 방향과 강도 결정
+                if (BB->Los_Degree > 0)
+                {
+                    adjustDirection = myRight * -1.0f; // 왼쪽으로 조정
+                }
+
+                float adjustmentDistance = BB->Los_Degree * 50.0f; // 각도에 비례하여 조정
+                entryPoint = myLocation + adjustDirection * adjustmentDistance + myForward * 200.0f;
+            }
+            else
+            {
+                // 각도는 좋으므로 현재 방향으로 전진하여 WEZ 유지
+                entryPoint = myLocation + myForward * 100.0f;
+            }
+        }
+
+        return entryPoint;
+    }
+
+    bool Task_WeaponEngagement::IsInWEZ(CPPBlackBoard* BB)
     {
         float distance = BB->Distance;
-        float aspectAngle = BB->MyAspectAngle_Degree;
-
-        // AIM-9M 사이드와인더 기본 범위
-        float rMin = 926.0f;   // 0.5nm
-        float rMax = 18520.0f; // 10nm
-
-        // 에스펙트에 따른 사거리 조정
-        if (aspectAngle < 60.0f) // 후방 공격
-        {
-            rMax *= 1.2f; // 후방에서 더 멀리 사격 가능
-        }
-        else if (aspectAngle > 120.0f) // 정면 공격
-        {
-            rMax *= 0.8f; // 정면에서는 사거리 감소
-        }
-
-        return (distance >= rMin && distance <= rMax);
-    }
-
-    bool Task_WeaponEngagement::IsInGunRange(CPPBlackBoard* BB)
-    {
-        float distance = BB->Distance;
-        float aspectAngle = BB->MyAspectAngle_Degree;
-
-        // M61 기관포 유효 사거리
-        float gunRange = 762.0f; // 2500 feet
-
-        if (aspectAngle > 120.0f) // 높은 에스펙트
-        {
-            gunRange *= 1.6f; // 4000 feet까지 확장
-        }
-
-        return (distance <= gunRange);
-    }
-
-    bool Task_WeaponEngagement::HasValidGunSolution(CPPBlackBoard* BB)
-    {
-        float angleOff = BB->MyAngleOff_Degree;
         float los = BB->Los_Degree;
 
-        // 기총 사격 조건
-        // 1. 앵글 오프가 45도 이내
-        // 2. LOS가 적절한 범위 내
-        // 3. Lead Pursuit 상태
+        // WEZ 거리 조건 확인
+        bool rangeValid = (distance >= WEZ_MIN_RANGE && distance <= WEZ_MAX_RANGE);
 
-        return (angleOff <= 45.0f && los <= 30.0f);
+        // WEZ 각도 조건 확인 (±2도)
+        bool angleValid = (fabs(los) <= WEZ_MAX_ANGLE);
+
+        // 추가 조건: 적기가 시야에 있어야 함
+        bool enemyInSight = BB->EnemyInSight;
+
+        return rangeValid && angleValid && enemyInSight;
+    }
+
+    bool Task_WeaponEngagement::HasValidWeaponSolution(CPPBlackBoard* BB)
+    {
+        // WEZ 조건과 동일
+        return IsInWEZ(BB);
     }
 }

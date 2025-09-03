@@ -64,6 +64,8 @@ void UCPPBehaviorTree::init()
 	Factory.registerNodeType<Action::AngleOffUpdate>("AngleOffUpdate");
 	Factory.registerNodeType<Action::DirectionVectorUpdate>("DirectionVectorUpdate");
 	Factory.registerNodeType<Action::AspectAngleUpdate>("AspectAngleUpdate");
+	Factory.registerNodeType<Action::AltitudeSafetyCheck>("AltitudeSafetyCheck");
+
 	Factory.registerNodeType<Action::DECO_BFMCheck>("DECO_BFMCheck");
 	Factory.registerNodeType<Action::DECO_DistanceCheck>("DECO_DistanceCheck");
 

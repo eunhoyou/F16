@@ -122,12 +122,11 @@ namespace Action
 
     bool Task_DefensiveBFM::IsUnderMissileAttack(CPPBlackBoard* BB)
     {
-        // 간단한 미사일 공격 판단 로직
-        // 실제로는 RWR(레이더 경고 수신기) 신호나 미사일 탐지 로직이 필요
+        // 미사일 공격 판단 로직
         float los = BB->Los_Degree;
         float distance = BB->Distance;
 
-        // 적기가 나를 향하고 있고 일정 거리 이내면 미사일 공격 가능성 높음
-        return (distance > 1852.0f && distance < 18520.0f && los < 30.0f);
+        // 적기가 나를 향하고 있고 공격 사거리 내인지 확인
+        return (distance > 152.4f && distance < 914.4f && los < 30.0f);
     }
 }
