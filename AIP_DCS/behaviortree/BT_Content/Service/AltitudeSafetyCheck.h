@@ -12,9 +12,9 @@ namespace Action
     class AltitudeSafetyCheck : public SyncActionNode
     {
     private:
-        static constexpr double MIN_SAFE_ALTITUDE = 2000.0;  // 안전 마진
-        static constexpr double CRITICAL_ALTITUDE = 1500.0;  // 긴급 상승 임계점
-        static constexpr double EMERGENCY_ALTITUDE = 1000.0; // 최대 긴급 상승
+        static constexpr double MIN_SAFE_ALTITUDE = 1000.0;
+        static constexpr double CRITICAL_ALTITUDE = 800.0;
+        static constexpr double EMERGENCY_ALTITUDE = 600.0;
 
     public:
         AltitudeSafetyCheck(const std::string& name, const NodeConfiguration& config) : SyncActionNode(name, config)

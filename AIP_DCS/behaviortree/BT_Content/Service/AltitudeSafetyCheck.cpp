@@ -15,15 +15,13 @@ namespace Action
 
         float currentAltitude = (*BB)->MyLocation_Cartesian.Z;
 
-        // 1000m 매우 근접 - 즉시 최대 상승
         if (IsAltitudeEmergency(currentAltitude))
         {
             (*BB)->VP_Cartesian = CalculateEmergencyClimb(BB.value());
-            (*BB)->Throttle = 1.0f; // 최대 추력
+            (*BB)->Throttle = 1.0f;
             return NodeStatus::SUCCESS;
         }
 
-        // 1500m 이하 - VP 고도 수정
         if (IsAltitudeCritical(currentAltitude))
         {
             Vector3 currentVP = (*BB)->VP_Cartesian;
@@ -60,8 +58,8 @@ namespace Action
         Vector3 myUp = BB->MyUpVector;
 
         // 긴급 상승: 현재 위치에서 수직으로 상승
-        Vector3 emergencyPoint = myLocation + myUp * 1000.0f; // 1000m 상승
-        emergencyPoint.Z = std::max(emergencyPoint.Z, MIN_SAFE_ALTITUDE + 200.0f);
+        Vector3 emergencyPoint = myLocation + myUp * 500.0f;
+        emergencyPoint.Z = std::max(emergencyPoint.Z, MIN_SAFE_ALTITUDE + 500.0f);
 
         // 약간 전진하며 상승 (실속 방지)
         emergencyPoint = emergencyPoint + myForward * 300.0f;

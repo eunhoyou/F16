@@ -80,16 +80,8 @@ void UCPPBehaviorTree::init()
 	Factory.registerNodeType<Action::Task_WeaponEngagement>("Task_WeaponEngagement");
 	Factory.registerNodeType<Action::Task_Pure>("Task_Pure");
 
-
 	//파일로 트리 구조 정의
 	tree = Factory.createTreeFromFile("./KAURML.xml");
-	
-	//문자열로 트리 구조 정의
-	//std::string XML = StrCat(xml_text1, xml_text2);
-	////std::cout << XML << std::endl;
-	//tree = Factory.createTreeFromText(XML);
-
-	//블랙보드 연결 : 원래는 블랙보드 내에 있는 모든 변수를 하나하나 이런식으로 입력해줘야하는 미친 비효율을 보이는 방식이지만 커스텀 블랙보드를 만들어 해당 블랙보드를 입력시킴
 	tree.rootBlackboard()->set<CPPBlackBoard*>("BB", BB);
 	
 }

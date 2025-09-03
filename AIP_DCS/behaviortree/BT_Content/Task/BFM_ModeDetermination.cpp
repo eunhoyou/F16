@@ -19,7 +19,7 @@ namespace Action
         bool enemyInSight = (*BB)->EnemyInSight;
 
         // 가시거리 밖 상황 (BVR - Beyond Visual Range)
-        if (distance > 18520.0f) // 10nm = 18520m
+        if (distance > 6000.0f) // 6km 이상
         {
             (*BB)->BFM = DETECTING;
             return NodeStatus::SUCCESS;
