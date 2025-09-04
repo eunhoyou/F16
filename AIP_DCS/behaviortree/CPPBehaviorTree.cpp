@@ -54,10 +54,11 @@ UCPPBehaviorTree::~UCPPBehaviorTree()
 
 void UCPPBehaviorTree::init()
 {
-
+	
 	/*
 	노드 입력 : 구현해둔 노드들을 Factory 객체에 입력해주는 과정
 	*/
+
 	Factory.registerNodeType<Action::SelectTarget>("SelectTarget");
 	Factory.registerNodeType<Action::DistanceUpdate>("DistanceUpdate");
 	Factory.registerNodeType<Action::CheckSight>("CheckSight");
@@ -80,10 +81,9 @@ void UCPPBehaviorTree::init()
 	Factory.registerNodeType<Action::Task_WeaponEngagement>("Task_WeaponEngagement");
 	Factory.registerNodeType<Action::Task_Pure>("Task_Pure");
 
-	//파일로 트리 구조 정의
+	// //파일로 트리 구조 정의
 	tree = Factory.createTreeFromFile("./KAURML.xml");
 	tree.rootBlackboard()->set<CPPBlackBoard*>("BB", BB);
-	
 }
 
 StickValue UCPPBehaviorTree::Step(PlaneInfo MyInfo, int NumofOtherPlane, PlaneInfo* OthersInfo, Vector3 & VP, float & Throttle)
@@ -104,7 +104,6 @@ StickValue UCPPBehaviorTree::Step(PlaneInfo MyInfo, int NumofOtherPlane, PlaneIn
 	Myinfo.Resv0 = MyInfo.Resv0;		//ID
 	Myinfo.Resv1 = MyInfo.Resv1;		//HP
 	Myinfo.Resv2 = MyInfo.Resv2;		//OperationMode
-
 
 	//HP가 0이하가 되면 자유 낙하하도록 설정
 	if (Myinfo.Resv1 <= 0)
@@ -189,7 +188,6 @@ StickValue UCPPBehaviorTree::Step(PlaneInfo MyInfo, int NumofOtherPlane, PlaneIn
 		// //임시 코드
 		// Throttle = 1.0;
 
-
 		R = Controller.GetStick(
 			BB->MyLocation_Cartesian,
 			Vector3(BB->MyRotation_EDegree.Roll*DEG2RAD,
@@ -212,13 +210,26 @@ Vector3 UCPPBehaviorTree::GetVP()
 
  void UCPPBehaviorTree::RunCPPBT(Vector3& VP, float& Throttle, bool& AimmingMode)
 {
+	// BB->RunningTime += BB->DeltaSecond;	//시뮬레이선 타임에 따른 델타 타임 설정
+	// tree.tickRoot(); //트리 작동
 	
-	BB->RunningTime += BB->DeltaSecond;	//시뮬레이선 타임에 따른 델타 타임 설정
-	tree.tickRoot(); //트리 작동
+	// VP = Vector3(BB->VP_Cartesian.X, BB->VP_Cartesian.Y, BB->VP_Cartesian.Z);
 	
-	VP = Vector3(BB->VP_Cartesian.X, BB->VP_Cartesian.Y, BB->VP_Cartesian.Z);
+	// Throttle = BB->Throttle;	// 쓰로틀 값
+
+
+
+
+	BB->RunningTime += BB->DeltaSecond;
+    
+    NodeStatus result = tree.tickRoot();
 	
-	Throttle = BB->Throttle;	// 쓰로틀 값
+    std::cout << "[DEBUG] RunCPPBT 결과: " << (int)result << std::endl;
+    
+    VP = Vector3(BB->VP_Cartesian.X, BB->VP_Cartesian.Y, BB->VP_Cartesian.Z);
+    Throttle = BB->Throttle;
+    
+    std::cout << "[DEBUG] RunCPPBT 최종 반환 VP: (" << VP.X << ", " << VP.Y << ", " << VP.Z << ")" << std::endl;
 }
 
  void UCPPBehaviorTree::SetDeltaTime(double DT)

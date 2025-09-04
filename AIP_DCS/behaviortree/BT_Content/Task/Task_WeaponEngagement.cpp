@@ -37,26 +37,7 @@ namespace Action
     Vector3 Task_WeaponEngagement::CalculateWeaponAimPoint(CPPBlackBoard* BB)
     {
         // WEZ 내에서 무기 사격을 위한 정밀 조준점 계산
-        Vector3 targetLocation = BB->TargetLocaion_Cartesian;
-        Vector3 targetForward = BB->TargetForwardVector;
-        Vector3 targetRight = BB->TargetRightVector;
-        float targetSpeed = BB->TargetSpeed_MS;
-        float distance = BB->Distance;
-
-        // 시뮬레이터 무기 시스템의 탄환/미사일 속도 (예상값)
-        float projectileSpeed = 900.0f; // m/s (시뮬레이터 설정에 따라 조정 가능)
-
-        // 비행 시간 계산
-        float timeOfFlight = distance / projectileSpeed;
-
-        // Lead 계산 - 적기의 예상 위치
-        Vector3 leadVector = targetForward * targetSpeed * timeOfFlight;
-
-        // 적기가 선회 중인 경우를 위한 추가 lead (간단한 예측)
-        Vector3 turnLead = targetRight * targetSpeed * 0.05f; // 5% 선회 보정
-
-        // 최종 조준점
-        Vector3 aimPoint = targetLocation + leadVector + turnLead;
+        Vector3 aimPoint = BB->TargetLocaion_Cartesian;
 
         return aimPoint;
     }
@@ -93,21 +74,21 @@ namespace Action
             // 거리는 적절하지만 각도가 맞지 않을 때 - 각도 조정을 위한 기동
             Vector3 myForward = BB->MyForwardVector;
             Vector3 myRight = BB->MyRightVector;
-
+            
             // LOS가 2도 이내로 들어오도록 조정
             float adjustmentDistance = 200.0f;
-
+            
             if (BB->Los_Degree > 2.0f)
             {
                 // LOS 각도가 2도를 초과할 때 각도 조정 기동
                 Vector3 adjustDirection = myRight;
-
+                
                 // LOS 각도에 따라 조정 방향과 강도 결정
                 if (BB->Los_Degree > 0)
                 {
                     adjustDirection = myRight * -1.0f; // 왼쪽으로 조정
                 }
-
+                
                 float adjustmentDistance = BB->Los_Degree * 50.0f; // 각도에 비례하여 조정
                 entryPoint = myLocation + adjustDirection * adjustmentDistance + myForward * 200.0f;
             }
@@ -128,7 +109,7 @@ namespace Action
 
         // WEZ 거리 조건 확인
         bool rangeValid = (distance >= WEZ_MIN_RANGE && distance <= WEZ_MAX_RANGE);
-
+        
         // WEZ 각도 조건 확인 (±2도)
         bool angleValid = (fabs(los) <= WEZ_MAX_ANGLE);
 

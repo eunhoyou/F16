@@ -7,7 +7,7 @@
 			<Sequence>
 				<SelectTarget name="SelectTarget" BB="{BB}"/>
 				<DirectionVectorUpdate name="DirectionVectorUpdate" BB="{BB}"/>
-				<DistanceUpdate name="DistanceUpdateService" BB="{BB}"/>
+				<DistanceUpdate name="DistanceUpdate" BB="{BB}"/>
 				<CheckSight name="CheckSight" BB="{BB}"/>          
 				<AngleOffUpdate name="AngleOffUpdate" BB="{BB}"/>
 				<AspectAngleUpdate name="AspectAngleUpdate" BB="{BB}"/>

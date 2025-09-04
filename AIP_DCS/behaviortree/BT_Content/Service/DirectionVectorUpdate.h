@@ -16,8 +16,6 @@ namespace Action
 
 
 	public:
-
-
 		DirectionVectorUpdate(const std::string& name, const NodeConfiguration& config) : SyncActionNode(name, config)
 		{
 		}

@@ -12,7 +12,7 @@ namespace Action
     NodeStatus Task_HeadOnBFM::tick()
     {
         Optional<CPPBlackBoard*> BB = getInput<CPPBlackBoard*>("BB");
-
+            
         float distance = (*BB)->Distance;
         float mySpeed = (*BB)->MySpeed_MS;
         float targetSpeed = (*BB)->TargetSpeed_MS;

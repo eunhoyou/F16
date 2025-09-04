@@ -18,13 +18,6 @@ namespace Action
         float angleOff = (*BB)->MyAngleOff_Degree;
         bool enemyInSight = (*BB)->EnemyInSight;
 
-        // 가시거리 밖 상황 (BVR - Beyond Visual Range)
-        if (distance > 6000.0f) // 6km 이상
-        {
-            (*BB)->BFM = DETECTING;
-            return NodeStatus::SUCCESS;
-        }
-
         // 시야에 없는 경우 탐지 모드
         if (!enemyInSight)
         {
@@ -32,21 +25,21 @@ namespace Action
             return NodeStatus::SUCCESS;
         }
 
-        // Head-on BFM 판단 (높은 에스펙트, 높은 앵글 오프)
+        // Head-on BFM 판단
         if (aspectAngle > 120.0f && angleOff > 120.0f)
         {
             (*BB)->BFM = HABFM;
             return NodeStatus::SUCCESS;
         }
 
-        // Offensive BFM 판단 (낮은 에스펙트)
+        // Offensive BFM 판단
         if (aspectAngle < 60.0f)
         {
             (*BB)->BFM = OBFM;
             return NodeStatus::SUCCESS;
         }
 
-        // Defensive BFM 판단 (적기가 내 후방에 있는 경우)
+        // Defensive BFM 판단
         if (aspectAngle > 120.0f && angleOff < 60.0f)
         {
             (*BB)->BFM = DBFM;

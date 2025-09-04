@@ -32,7 +32,7 @@ namespace Action
             }
             else
             {
-                // 3000피트 이내에서는 리드 추적
+                // 3000피트 이내에서는 리드 추적 (기총 사격)
                 (*BB)->VP_Cartesian = CalculateLeadPursuit(BB.value());
             }
         }

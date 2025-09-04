@@ -15,27 +15,39 @@ namespace Action
 
         float distance = (*BB)->Distance;
         float los = (*BB)->Los_Degree;
+        Vector3 calculated_vp; // 계산된 VP를 담을 변수
 
         // 미사일 공격 상황 확인
         if (IsUnderMissileAttack(BB.value()))
         {
-            // 미사일 회피 - 빔 위치로 이동
-            (*BB)->VP_Cartesian = CalculateBeamManeuver(BB.value());
+            // [로그 추가] 어떤 기동이 선택되었는지 확인
+            std::cout << "  -> DefensiveBFM: 미사일 회피 기동 선택!" << std::endl;
+            calculated_vp = CalculateBeamManeuver(BB.value());
         }
-        else if (distance < 914.4f) // 3000 feet 이내 기총 방어
+        else if (distance < 914.4f)
         {
-            // 기총 방어 징킹
-            (*BB)->VP_Cartesian = CalculateJinkManeuver(BB.value());
+            // [로그 추가] 어떤 기동이 선택되었는지 확인
+            std::cout << "  -> DefensiveBFM: 기총 방어(징킹) 기동 선택!" << std::endl;
+            calculated_vp = CalculateJinkManeuver(BB.value());
         }
         else
         {
-            // 기본 방어 선회
-            (*BB)->VP_Cartesian = CalculateDefensiveTurn(BB.value());
+            // [로그 추가] 어떤 기동이 선택되었는지 확인
+            std::cout << "  -> DefensiveBFM: 기본 방어 선회 선택!" << std::endl;
+            calculated_vp = CalculateDefensiveTurn(BB.value());
         }
+
+        // [로그 추가] 블랙보드에 넣기 직전의 VP 값 확인
+        std::cout << "[TASK_DEBUG] DefensiveBFM calculated VP: ("
+            << calculated_vp.X << ", " << calculated_vp.Y << ", " << calculated_vp.Z << ")" << std::endl;
+
+        (*BB)->VP_Cartesian = calculated_vp;
 
         // 방어 시 최대 스로틀
         (*BB)->Throttle = 1.0f;
 
+        // 참고: 방어 기동은 여러 프레임에 걸쳐 지속되므로 RUNNING을 반환하는 것이 일반적입니다.
+        // 하지만 지금은 디버깅이 우선이므로 SUCCESS도 괜찮습니다.
         return NodeStatus::SUCCESS;
     }
 

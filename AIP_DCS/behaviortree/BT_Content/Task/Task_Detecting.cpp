@@ -13,9 +13,10 @@ namespace Action
     {
         Optional<CPPBlackBoard*> BB = getInput<CPPBlackBoard*>("BB");
 
+
         float distance = (*BB)->Distance;
         
-        if (distance > 6000.0f && (*BB)->EnemyInSight)
+        if ((*BB)->EnemyInSight)
         {
             // 6km 이상 원거리이고 시야에 있을 때만 전략적인 후방 점유(Stern Conversion) 시도
             (*BB)->VP_Cartesian = CalculateSternConversion(BB.value());
@@ -91,7 +92,7 @@ namespace Action
         }
 
         // 적기 측면으로 이동하여 터닝 룸 확보
-        Vector3 sternPoint = targetLocation + offsetDirection * 2000.0f - targetForward * 3000.0f;
+        Vector3 sternPoint = targetLocation + offsetDirection * 200.0f - targetForward * 300.0f;
 
         return sternPoint;
     }
