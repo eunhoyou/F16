@@ -16,7 +16,7 @@ namespace Action
         Vector3 CalculateDefensiveTurn(CPPBlackBoard* BB);
         Vector3 CalculateBeamManeuver(CPPBlackBoard* BB);
         Vector3 CalculateJinkManeuver(CPPBlackBoard* BB);
-        bool IsUnderMissileAttack(CPPBlackBoard* BB);
+        bool IsUnderAttack(CPPBlackBoard* BB);
 
     public:
         Task_DefensiveBFM(const std::string& name, const NodeConfiguration& config) : SyncActionNode(name, config)

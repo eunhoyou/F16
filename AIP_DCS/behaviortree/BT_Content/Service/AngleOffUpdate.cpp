@@ -14,7 +14,7 @@ namespace Action
 	NodeStatus AngleOffUpdate::tick()
 	{
 		Optional<CPPBlackBoard*> BB = getInput<CPPBlackBoard*>("BB");
-
+		std::cout << "[AngleOffUpdate] Starting..." << std::endl;
 		Vector3 MFV = (*BB)->MyForwardVector;			//블랙보드에서 ForwardVector 불러옴
 		Vector3 TFV = (*BB)->TargetForwardVector;		//블랙보드에서 적기의 ForwardVector 불러옴
 		float dot = (*BB)->MyForwardVector.angleBetween((*BB)->TargetForwardVector);		//

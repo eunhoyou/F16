@@ -82,8 +82,36 @@ void UCPPBehaviorTree::init()
 	Factory.registerNodeType<Action::Task_Pure>("Task_Pure");
 
 	// //파일로 트리 구조 정의
-	tree = Factory.createTreeFromFile("./KAURML.xml");
-	tree.rootBlackboard()->set<CPPBlackBoard*>("BB", BB);
+	//tree = Factory.createTreeFromFile("./KAURML.xml");
+	//tree.rootBlackboard()->set<CPPBlackBoard*>("BB", BB);
+
+	try {
+		std::cout << "[INIT] Loading XML file: ./KAURML.xml" << std::endl;
+		tree = Factory.createTreeFromFile("./KAURML.xml");
+		std::cout << "[INIT] XML loaded successfully" << std::endl;
+
+		// 블랙보드 설정 방법 변경
+		auto blackboard = tree.rootBlackboard();
+		if (blackboard) {
+			blackboard->set<CPPBlackBoard*>("BB", BB);
+			std::cout << "[INIT] Blackboard set successfully" << std::endl;
+
+			// 블랙보드 설정 확인
+			CPPBlackBoard* test_bb = nullptr;
+			if (blackboard->get<CPPBlackBoard*>("BB", test_bb) && test_bb != nullptr) {
+				std::cout << "[INIT] Blackboard verification successful" << std::endl;
+			}
+			else {
+				std::cout << "[INIT] ERROR: Blackboard verification failed" << std::endl;
+			}
+		}
+		else {
+			std::cout << "[INIT] ERROR: Root blackboard is null" << std::endl;
+		}
+	}
+	catch (const std::exception& e) {
+		std::cout << "[INIT] ERROR loading XML: " << e.what() << std::endl;
+	}
 }
 
 StickValue UCPPBehaviorTree::Step(PlaneInfo MyInfo, int NumofOtherPlane, PlaneInfo* OthersInfo, Vector3 & VP, float & Throttle)
@@ -208,22 +236,26 @@ Vector3 UCPPBehaviorTree::GetVP()
 }
 
 
- void UCPPBehaviorTree::RunCPPBT(Vector3& VP, float& Throttle, bool& AimmingMode)
+// CPPBehaviorTree.cpp의 RunCPPBT 함수에 다음 디버깅 코드 추가
+void UCPPBehaviorTree::RunCPPBT(Vector3& VP, float& Throttle, bool& AimmingMode)
 {
-	// BB->RunningTime += BB->DeltaSecond;	//시뮬레이선 타임에 따른 델타 타임 설정
-	// tree.tickRoot(); //트리 작동
-	
-	// VP = Vector3(BB->VP_Cartesian.X, BB->VP_Cartesian.Y, BB->VP_Cartesian.Z);
-	
-	// Throttle = BB->Throttle;	// 쓰로틀 값
-
-
-
-
-	BB->RunningTime += BB->DeltaSecond;
+    BB->RunningTime += BB->DeltaSecond;
+    
+    // 디버깅: 적기 정보 확인
+	std::cout << "--------------------------------------------------------------------------------------------- " << BB->Enemy.size() << std::endl;
+    std::cout << "[DEBUG] Enemy count: " << BB->Enemy.size() << std::endl;
+    if(BB->Enemy.size() > 0) {
+        std::cout << "[DEBUG] Enemy position: (" 
+                  << BB->Enemy[0].Location.X << ", " 
+                  << BB->Enemy[0].Location.Y << ", " 
+                  << BB->Enemy[0].Location.Z << ")" << std::endl;
+    }
+    
+    // 디버깅: BFM 모드 확인
+    std::cout << "[DEBUG] Current BFM mode: " << (int)BB->BFM << std::endl;
+    std::cout << "[DEBUG] EnemyInSight: " << BB->EnemyInSight << std::endl;
     
     NodeStatus result = tree.tickRoot();
-	
     std::cout << "[DEBUG] RunCPPBT 결과: " << (int)result << std::endl;
     
     VP = Vector3(BB->VP_Cartesian.X, BB->VP_Cartesian.Y, BB->VP_Cartesian.Z);

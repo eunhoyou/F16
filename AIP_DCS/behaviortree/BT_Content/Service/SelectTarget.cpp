@@ -12,6 +12,7 @@ namespace Action
 	NodeStatus SelectTarget::tick()
 	{
 		Optional<CPPBlackBoard*> BB = getInput<CPPBlackBoard*>("BB");
+		std::cout << "[SelectTarget] Enemy size: " << (*BB)->Enemy.size() << std::endl;
 
 		if((*BB)->Enemy.size() > 0)
 		{

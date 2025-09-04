@@ -16,6 +16,8 @@ namespace Action
 		Optional<std::string> CheckBFM = getInput<std::string>("CheckBFM");
 
 		BFM_Mode CurrentBFM = (*BB)->BFM;
+		std::cout << "[DECO_BFMCheck] Current BFM: " << (int)CurrentBFM 
+              << ", Checking for: " << CheckBFM.value() << std::endl;
 		BFM_Mode InputBFM;
 
 		std::string str = CheckBFM.value();
@@ -47,10 +49,14 @@ namespace Action
 
 		if (CurrentBFM == InputBFM)
 		{
+			std::cout << "[DECO_BFMCheck] BFM match - SUCCESS" << std::endl;
 			return NodeStatus::SUCCESS;
 		}
 		else
+		{
+			std::cout << "[DECO_BFMCheck] BFM mismatch - FAILURE" << std::endl;
 			return NodeStatus::FAILURE;
+		}
 	}
 
 }

@@ -14,7 +14,6 @@ namespace Action
 	NodeStatus DistanceUpdate::tick()
 	{
 		Optional<CPPBlackBoard*> BB = getInput<CPPBlackBoard*>("BB");
-
 		Vector3 MyLocation = (*BB)->MyLocation_Cartesian;
 		Vector3 TargetLocation = (*BB)->TargetLocaion_Cartesian;
 
