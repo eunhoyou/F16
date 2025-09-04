@@ -1,2 +1,0 @@
-SUCCESS! DirectionVectorUpdate object was CREATED! 
-SUCCESS! DirectionVectorUpdate object was CREATED! 
