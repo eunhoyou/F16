@@ -14,7 +14,7 @@ if __name__ == "__main__":
     }
 
     AIP_ownship = CppBT.AIPilot("AIP_DCS.dll")
-    AIP_target = CppBT.AIPilot("AIP_DCS.dll")
+    AIP_target = CppBT.AIPilot("AIP_DCS_Target.dll")
     engageEnv = DogFightWrapper(env_config, AIP_ownship, AIP_target)
         
     engageEnv.reset()

@@ -43,7 +43,7 @@
                 </Sequence>
 
                 <!-- 정면 BFM -->
-                <Sequence name="HeadOn_BFM">
+                <Sequence>
                     <DECO_BFMCheck name="DECO_BFMCheck" BB="{BB}" CheckBFM="HABFM" />
                     <Task_HeadOnBFM name="Task_HeadOnBFM" BB="{BB}" />
                 </Sequence>
