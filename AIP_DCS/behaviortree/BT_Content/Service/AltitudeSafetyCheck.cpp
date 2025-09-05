@@ -13,24 +13,33 @@ namespace Action
     {
         Optional<CPPBlackBoard*> BB = getInput<CPPBlackBoard*>("BB");
 
-        float currentAltitude = -(*BB)->MyLocation_Cartesian.Z;  // Z는 Down이므로 음수 취함
+        std::cout << "[AltitudeSafetyCheck] Starting altitude safety check..." << std::endl;
+
+        float currentAltitude = -(*BB)->MyLocation_Cartesian.Z;  // NED에서 실제 고도로 변환
+        
+        std::cout << "[AltitudeSafetyCheck] Current altitude: " << currentAltitude << " meters" << std::endl;
+        std::cout << "[AltitudeSafetyCheck] Z coordinate: " << (*BB)->MyLocation_Cartesian.Z << std::endl;
 
         // 응급 상황 (600m 이하)
         if (IsAltitudeEmergency(currentAltitude))
         {
+            std::cout << "[AltitudeSafetyCheck] EMERGENCY: Altitude below 600m!" << std::endl;
             (*BB)->VP_Cartesian = CalculateEmergencyClimb(BB.value());
             (*BB)->Throttle = 1.0f;
+            std::cout << "[AltitudeSafetyCheck] Emergency climb initiated - RETURNING SUCCESS" << std::endl;
             return NodeStatus::SUCCESS;
         }
 
         // 위험 상황 (800m 이하)
         if (IsAltitudeCritical(currentAltitude))
         {
+            std::cout << "[AltitudeSafetyCheck] WARNING: Altitude below 800m!" << std::endl;
             Vector3 currentVP = (*BB)->VP_Cartesian;
 
             // VP의 고도가 현재보다 낮으면 안전 고도로 상승
             if (-currentVP.Z < MIN_SAFE_ALTITUDE)  // NED에서 실제 고도로 변환
             {
+                std::cout << "[AltitudeSafetyCheck] Adjusting VP altitude to safe level" << std::endl;
                 currentVP.Z = -MIN_SAFE_ALTITUDE;  // 1000m 고도를 NED로 변환
                 (*BB)->VP_Cartesian = currentVP;
             }
@@ -46,12 +55,16 @@ namespace Action
         Vector3 plannedVP = (*BB)->VP_Cartesian;
         float plannedAltitude = -plannedVP.Z;  // NED를 실제 고도로 변환
 
+        std::cout << "[AltitudeSafetyCheck] Planned VP altitude: " << plannedAltitude << " meters" << std::endl;
+
         if (plannedAltitude < MIN_SAFE_ALTITUDE)
         {
+            std::cout << "[AltitudeSafetyCheck] VP altitude too low, adjusting to safe altitude" << std::endl;
             plannedVP.Z = -MIN_SAFE_ALTITUDE;  // 1000m를 NED로 변환 (-1000)
             (*BB)->VP_Cartesian = plannedVP;
         }
 
+        std::cout << "[AltitudeSafetyCheck] Normal altitude - RETURNING SUCCESS" << std::endl;
         return NodeStatus::SUCCESS;
     }
 
@@ -82,6 +95,10 @@ namespace Action
 
     bool AltitudeSafetyCheck::IsAltitudeEmergency(float currentAltitude)
     {
-        return currentAltitude <= EMERGENCY_ALTITUDE;
+        std::cout << "[IsAltitudeEmergency] Checking altitude: " << currentAltitude 
+                << " vs emergency threshold: " << EMERGENCY_ALTITUDE << std::endl;
+        bool result = currentAltitude <= EMERGENCY_ALTITUDE;
+        std::cout << "[IsAltitudeEmergency] Result: " << (result ? "EMERGENCY" : "NORMAL") << std::endl;
+        return result;
     }
 }

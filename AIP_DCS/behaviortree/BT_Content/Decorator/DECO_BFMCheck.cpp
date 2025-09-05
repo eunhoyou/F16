@@ -43,7 +43,7 @@ namespace Action
 		}
 		else
 		{
-			//CheckBFM 입력 문자열이 오타난건 아닌지 확인 필요!!!! OBFM,DBFM, HABFM, SCISSORS, DETECTING 가 아님
+			//CheckBFM 입력 문자열이 오타난건 아닌지 확인 필요!!!! OBFM, DBFM, HABFM, SCISSORS, DETECTING 가 아님
 			InputBFM = NONE;
 		}
 

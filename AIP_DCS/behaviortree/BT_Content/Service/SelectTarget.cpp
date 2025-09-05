@@ -23,8 +23,11 @@ namespace Action
 			(*BB)->TargetSpeed_MS = (*BB)->Enemy.at(0).Speed;
 
 		}
-				
-		return NodeStatus::SUCCESS;
+		std::cout << "[SelectTarget] About to return SUCCESS" << std::endl;
+        NodeStatus result = NodeStatus::SUCCESS;
+        std::cout << "[SelectTarget] SUCCESS value: " << (int)result << std::endl;
+        return result;		
+		// return NodeStatus::SUCCESS;
 	}
 
 }

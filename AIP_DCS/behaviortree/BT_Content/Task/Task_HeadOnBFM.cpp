@@ -14,25 +14,24 @@ namespace Action
         Optional<CPPBlackBoard*> BB = getInput<CPPBlackBoard*>("BB");
         
         std::cout << "[Task_HeadOnBFM] Starting Head-on BFM..." << std::endl;
-
+            
         float distance = (*BB)->Distance;
         float mySpeed = (*BB)->MySpeed_MS;
         float targetSpeed = (*BB)->TargetSpeed_MS;
 
         std::cout << "[Task_HeadOnBFM] Distance: " << distance 
-              << ", MySpeed: " << mySpeed 
-              << ", TargetSpeed: " << targetSpeed << std::endl;
+                << ", MySpeed: " << mySpeed 
+                << ", TargetSpeed: " << targetSpeed << std::endl;
 
         // 이탈 창 확인
         if (IsEscapeWindowOpen(BB.value()) && distance < 3704.0f) // 2nm 이내
         {
             std::cout << "[Task_HeadOnBFM] Escape window open - disengaging" << std::endl;
-            // 전투 중단하고 이탈
             Vector3 myLocation = (*BB)->MyLocation_Cartesian;
             Vector3 myForward = (*BB)->MyForwardVector;
             (*BB)->VP_Cartesian = myLocation + myForward * 5000.0f;
             (*BB)->Throttle = 1.0f;
-            std::cout << "[Task_HeadOnBFM] Completed successfully" << std::endl;
+            std::cout << "[Task_HeadOnBFM] Returning SUCCESS (escape)" << std::endl;
             return NodeStatus::SUCCESS;
         }
 
@@ -77,7 +76,7 @@ namespace Action
             (*BB)->Throttle = 0.8f;
         }
 
-        std::cout << "[Task_HeadOnBFM] Completed successfully" << std::endl;
+        std::cout << "[Task_HeadOnBFM] Returning SUCCESS (normal)" << std::endl;
         return NodeStatus::SUCCESS;
     }
 
