@@ -14,7 +14,7 @@ namespace Action
 	NodeStatus DirectionVectorUpdate::tick()
 	{
 		Optional<CPPBlackBoard*> BB = getInput<CPPBlackBoard*>("BB");
-		std::cout << "[DirectionVectorUpdate] Starting..." << std::endl;
+
 		EulerAngle MyRotation = (*BB)->MyRotation_EDegree;
 		
 		//아군기

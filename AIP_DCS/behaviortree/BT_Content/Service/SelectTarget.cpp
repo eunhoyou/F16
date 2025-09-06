@@ -12,7 +12,6 @@ namespace Action
 	NodeStatus SelectTarget::tick()
 	{
 		Optional<CPPBlackBoard*> BB = getInput<CPPBlackBoard*>("BB");
-		std::cout << "[SelectTarget] Enemy size: " << (*BB)->Enemy.size() << std::endl;
 
 		if((*BB)->Enemy.size() > 0)
 		{
@@ -23,11 +22,9 @@ namespace Action
 			(*BB)->TargetSpeed_MS = (*BB)->Enemy.at(0).Speed;
 
 		}
-		std::cout << "[SelectTarget] About to return SUCCESS" << std::endl;
-        NodeStatus result = NodeStatus::SUCCESS;
-        std::cout << "[SelectTarget] SUCCESS value: " << (int)result << std::endl;
-        return result;		
-		// return NodeStatus::SUCCESS;
+        
+        return NodeStatus::SUCCESS;
+
 	}
 
 }

@@ -14,7 +14,7 @@ namespace Action
 	NodeStatus AspectAngleUpdate::tick()
 	{
 		Optional<CPPBlackBoard*> BB = getInput<CPPBlackBoard*>("BB");
-		std::cout << "[AspectAngleUpdate] Starting..." << std::endl;
+
 		Vector3 MyLocation = (*BB)->MyLocation_Cartesian;				//내 위치
 		Vector3 TargetLocation = (*BB)->TargetLocaion_Cartesian;		//타겟 위치
 		Vector3 TFV = (*BB)->TargetForwardVector;						//타겟의 Forward Vector
