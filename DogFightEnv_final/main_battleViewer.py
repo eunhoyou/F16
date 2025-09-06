@@ -33,7 +33,7 @@ if __name__ == "__main__":
     }
     
     AIP_ownship = CppBT.AIPilot("AIP_DCS.dll")
-    AIP_target = CppBT.AIPilot("AIP_DCS_Target.dll")
+    AIP_target = CppBT.AIPilot("AIP_DCS.dll")
     command_evt = threading.Event()
     init_evt = threading.Event()
     state_q = queue.Queue(maxsize=10)
